@@ -2,18 +2,32 @@ package dominio.desafio;
 
 import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 public class Dev {
     private String nome;
-    private Set<Conteudo> conteudoInscritos = new LinkedHashSet<>();
+    private Set<Conteudo> conteudosInscritos = new LinkedHashSet<>();
     private Set<Conteudo> conteudosConcluidos = new LinkedHashSet<>();
     
-    public void inscreverBootcamp(Bootcamp bootcamp){}
+    public void inscreverBootcamp(Bootcamp bootcamp){
+        this.conteudosInscritos.addAll(bootcamp.getConteudos());
+        bootcamp.getDevsInscritos().add(this);
+    }
     
-    public void progredir(){}
+    public void progredir(){
+        Optional<Conteudo> conteudo = this.conteudosInscritos.stream().findFirst();
+        if(conteudo.isPresent()) {
+            this.conteudosConcluidos.add(conteudo.get());
+            this.conteudosInscritos.remove(conteudo.get());
+        } else {
+            System.err.println("Você não está matriculado em nenhum conteúdo!");
+        }
+    }
     
-    public void calcularTotalXp(){}
+    public double calcularTotalXp(){
+        return this.conteudosConcluidos.stream().mapToDouble(conteudo -> conteudo.calcularXp()).sum();
+    }
 
     public String getNome() {
         return nome;
@@ -24,11 +38,11 @@ public class Dev {
     }
 
     public Set<Conteudo> getConteudoInscritos() {
-        return conteudoInscritos;
+        return conteudosInscritos;
     }
 
     public void setConteudoInscritos(Set<Conteudo> conteudoInscritos) {
-        this.conteudoInscritos = conteudoInscritos;
+        this.conteudosInscritos = conteudoInscritos;
     }
 
     public Set<Conteudo> getConteudosConcluidos() {
@@ -43,7 +57,7 @@ public class Dev {
     public int hashCode() {
         int hash = 7;
         hash = 41 * hash + Objects.hashCode(this.nome);
-        hash = 41 * hash + Objects.hashCode(this.conteudoInscritos);
+        hash = 41 * hash + Objects.hashCode(this.conteudosInscritos);
         hash = 41 * hash + Objects.hashCode(this.conteudosConcluidos);
         return hash;
     }
@@ -63,7 +77,7 @@ public class Dev {
         if (!Objects.equals(this.nome, other.nome)) {
             return false;
         }
-        if (!Objects.equals(this.conteudoInscritos, other.conteudoInscritos)) {
+        if (!Objects.equals(this.conteudosInscritos, other.conteudosInscritos)) {
             return false;
         }
         if (!Objects.equals(this.conteudosConcluidos, other.conteudosConcluidos)) {
